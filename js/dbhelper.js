@@ -149,8 +149,16 @@ class DBHelper {
   /**
    * Restaurant image URL.
    */
-  static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+  static imageUrlForRestaurant(restaurant, dimension) {
+    switch (dimension) {
+      case 'large':
+        return (`/img/${restaurant.photograph_large}`);
+      case 'medium':
+        return (`/img/${restaurant.photograph_medium}`);
+      default:
+        return (`/img/${restaurant.photograph}`);
+    }
+
   }
 
   /**
@@ -162,8 +170,8 @@ class DBHelper {
       title: restaurant.name,
       url: DBHelper.urlForRestaurant(restaurant),
       map: map,
-      animation: google.maps.Animation.DROP}
-    );
+      animation: google.maps.Animation.DROP
+    });
     return marker;
   }
 
