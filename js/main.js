@@ -10,7 +10,9 @@ var markers = []
 document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
+  if (!window.google) updateRestaurants();
 });
+
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -35,6 +37,9 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
     const option = document.createElement('option');
     option.innerHTML = neighborhood;
     option.value = neighborhood;
+
+    //Accessibility
+    option.setAttribute('role', 'option');
     select.append(option);
   });
 }
@@ -97,6 +102,28 @@ updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
+  //Accessibility
+  if (cIndex > 0) {
+    cSelect.querySelectorAll('option').forEach((item, index) => {
+      if (index === cIndex) {
+        item.setAttribute('aria-selected', 'true');
+      } else {
+        item.removeAttribute('aria-selected');
+      }
+    });
+  }
+
+  if (nIndex > 0) {
+    nSelect.querySelectorAll('option').forEach((item, index) => {
+      if (index === nIndex) {
+        item.setAttribute('aria-selected', 'true');
+      } else {
+        item.removeAttribute('aria-selected');
+      }
+    });
+
+  }
+
   DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
     if (error) { // Got an error!
       console.error(error);
@@ -127,22 +154,24 @@ resetRestaurants = (restaurants) => {
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
+  restaurants.forEach((restaurant, index) => {
+    ul.append(createRestaurantHTML(restaurant, index));
   });
-  addMarkersToMap();
+  if (window.google) {
+    addMarkersToMap();
+  }
 }
 
 /**
  * Create restaurant HTML.
  */
-createRestaurantHTML = (restaurant) => {
+createRestaurantHTML = (restaurant, index) => {
   const li = document.createElement('li');
 
   const figure = document.createElement('figure');
   const picture = document.createElement('picture');
 
-  for (var breakPoint of responsiveBreakPoints) {
+  for (let breakPoint of responsiveBreakPoints) {
 
     const source = document.createElement('source');
     source.media = '';
@@ -157,12 +186,12 @@ createRestaurantHTML = (restaurant) => {
     var srcsets = [];
 
     for (var srcset of breakPoint.srcset) {
-      if (srcset.imgSuffix === "small" ) continue;
+      if (srcset.imgSuffix === "small") continue;
       srcsets.push(`${DBHelper.imageUrlForRestaurant(restaurant, srcset.imgSuffix)}  ${srcset.imgCondition}`);
     }
 
     // if there is src set Add
-    if (srcsets.length >0) {
+    if (srcsets.length > 0) {
       source.srcset = srcsets.join(srcsets, ',');
       picture.append(source)
     }
@@ -170,9 +199,9 @@ createRestaurantHTML = (restaurant) => {
   }
 
   const image = document.createElement('img');
-  image.className= 'restaurant-img';
+  image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
-  image.alt = restaurant.name;
+  image.alt = `Image of the restaurant ${restaurant.name}`;
   picture.append(image);
 
   figure.append(picture);
@@ -200,8 +229,10 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
+  more.setAttribute('tabindex', index + 3);
   li.append(more)
 
+  // Set Tabindex
   return li
 }
 

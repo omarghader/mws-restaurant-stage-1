@@ -3,6 +3,7 @@
  */
 class DBHelper {
 
+
   /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
@@ -16,6 +17,7 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
+
     let xhr = new XMLHttpRequest();
     xhr.open('GET', DBHelper.DATABASE_URL);
     xhr.onload = () => {
@@ -23,11 +25,20 @@ class DBHelper {
         const json = JSON.parse(xhr.responseText);
         const restaurants = json.restaurants;
         callback(null, restaurants);
+
       } else { // Oops!. Got an error from server.
         const error = (`Request failed. Returned status of ${xhr.status}`);
         callback(error, null);
       }
+
     };
+
+    xhr.onerror = function(err) {
+      const error = (`Request failed. Returned status of ${xhr.status}`);
+      callback(error, null);
+
+    };
+
     xhr.send();
   }
 
@@ -109,9 +120,11 @@ class DBHelper {
   static fetchNeighborhoods(callback) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
+
       if (error) {
         callback(error, null);
       } else {
+
         // Get all neighborhoods from all restaurants
         const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
         // Remove duplicates from neighborhoods
@@ -165,6 +178,7 @@ class DBHelper {
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {
+    if (!window.google) return;
     const marker = new google.maps.Marker({
       position: restaurant.latlng,
       title: restaurant.name,

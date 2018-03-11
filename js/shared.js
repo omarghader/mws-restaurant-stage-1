@@ -68,7 +68,7 @@ responsiveImage = (restaurant) => {
   const image = document.createElement('img');
   image.className= 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
-  image.alt = restaurant.name;
+  image.alt = `Image of the restaurant ${restaurant.name}`;
   picture.append(image);
 
   figure.append(picture);

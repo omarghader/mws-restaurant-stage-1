@@ -20,6 +20,22 @@ window.initMap = () => {
   });
 }
 
+document.addEventListener('DOMContentLoaded', (event) => {
+  console.log('Loaded');
+  if (!window.google) {
+    fetchRestaurantFromURL((error, restaurant) => {
+      if (error) { // Got an error!
+        console.error(error);
+      } else {
+        
+        fillBreadcrumb();
+        DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+      }
+    });
+  }
+});
+
+
 /**
  * Get current restaurant from page URL.
  */
@@ -146,7 +162,7 @@ createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */
-fillBreadcrumb = (restaurant=self.restaurant) => {
+fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
