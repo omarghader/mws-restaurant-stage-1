@@ -285,13 +285,13 @@ nav h1 a {
 
 .inside figure {
   margin: 0;
-  width: calc(100% - 80px);
+  width: calc(100% - 40px);
   padding: 10px;
   max-width: 100%;
 }
 
 #restaurant-img img {
-  width: 90%
+  width: 100%
 }
 
 #restaurant-address {
