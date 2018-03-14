@@ -214,7 +214,7 @@ createRestaurantHTML = (restaurant, index) => {
 
   li.append(figure); // TODO : append figure
 
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
 
