@@ -20,20 +20,18 @@ window.initMap = () => {
   });
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
-  console.log('Loaded');
+window.onload = () => {
   if (!window.google) {
     fetchRestaurantFromURL((error, restaurant) => {
       if (error) { // Got an error!
         console.error(error);
       } else {
-        
         fillBreadcrumb();
         DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
       }
     });
   }
-});
+};
 
 
 /**
@@ -118,7 +116,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
+  const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
 
@@ -163,9 +161,13 @@ createReviewHTML = (review) => {
  * Add restaurant name to the breadcrumb navigation menu
  */
 fillBreadcrumb = (restaurant = self.restaurant) => {
-  const breadcrumb = document.getElementById('breadcrumb');
+  const breadcrumb = document.querySelector('#navBreadcrumb ul');
   const li = document.createElement('li');
-  li.innerHTML = restaurant.name;
+  const currentPage = document.createElement('a');
+  currentPage.innerHTML = restaurant.name;
+  currentPage.setAttribute('href', location.href)
+  currentPage.setAttribute('aria-current', 'page')
+  li.appendChild(currentPage);
   breadcrumb.appendChild(li);
 }
 

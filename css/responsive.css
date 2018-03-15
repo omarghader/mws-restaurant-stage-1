@@ -31,6 +31,10 @@ a:focus {
 
 /* ====================== Restaurant Listing ====================== */
 
+
+.restaurant-wrapper{
+  width: 50%;
+}
 #restaurants-list {}
 
 #restaurants-list figure {
@@ -43,7 +47,7 @@ a:focus {
 }
 
 @media screen and (max-width: 499px) {
-  nav {
+  nav:nth-child(1) {
     height: 55px;
   }
   nav h1 a {
@@ -76,9 +80,11 @@ a:focus {
     position: relative;
     top: 0px;
   }
-  #restaurant-container, #reviews-container {
-    padding: 20px 40px 30px;
+  .restaurant-wrapper{
     width: 100%;
+  }
+  #restaurant-container, #reviews-container {
+    padding: 20px 10px 10px;
   }
   /* ====================== Footer ====================== */
   .inside #footer {
@@ -95,6 +101,9 @@ a:focus {
     width: calc(50% - 15px);
     margin-right: 10px;
     padding: auto;
+  }
+  .restaurant-wrapper{
+    margin-bottom: 80px;
   }
 }
 
