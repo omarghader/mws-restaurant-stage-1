@@ -1,9 +1,8 @@
 var staticCacheName = 'restaurant-reviews-v1';
 var contentImgsCache = 'restaurant-reviews-content-imgs';
-var contentMapCache = 'restaurant-reviews-content-map';
 var contentDataCache = 'restaurant-reviews-content-data';
 
-var allCaches = [staticCacheName, contentImgsCache, contentMapCache, contentDataCache];
+var allCaches = [staticCacheName, contentImgsCache, contentDataCache];
 
 self.addEventListener('install', function(event) {
   event.waitUntil(caches.open(staticCacheName).then(function(cache) {
@@ -129,23 +128,6 @@ function serveData(request) {
     });
   });
 }
-
-
-// function serveMap(request) {
-//   var storageUrl = request.url;
-//
-//   return caches.open(contentMapCache).then(function(cache) {
-//     return cache.match(storageUrl).then(function(response) {
-//       if (response)
-//         return response;
-//
-//       return fetch(request).then(function(networkResponse) {
-//         cache.put(storageUrl, networkResponse.clone());
-//         return networkResponse;
-//       });
-//     });
-//   });
-// }
 
 self.addEventListener('message', function(event) {
   if (event.data.action === 'skipWaiting') {
