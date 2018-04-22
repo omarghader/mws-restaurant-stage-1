@@ -34,7 +34,7 @@ var responsiveBreakPoints = [{
 ];
 
 
-responsiveImage = (restaurant) => {
+const responsiveImage = (restaurant) => {
   const figure = document.createElement('figure');
   const picture = document.createElement('picture');
 
