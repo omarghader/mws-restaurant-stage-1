@@ -1,8 +1,8 @@
 let restaurants,
   neighborhoods,
   cuisines;
-var map
-var markers = []
+let map;
+const markers = [];
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
@@ -10,7 +10,7 @@ var markers = []
 document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
-  if (!window.google) updateRestaurants();
+  updateRestaurants();
 });
 
 
@@ -26,23 +26,23 @@ const fetchNeighborhoods = () => {
       fillNeighborhoodsHTML();
     }
   });
-}
+};
 
 /**
  * Set neighborhoods HTML.
  */
 const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
   const select = document.getElementById('neighborhoods-select');
-  neighborhoods.forEach(neighborhood => {
+  neighborhoods.forEach((neighborhood) => {
     const option = document.createElement('option');
     option.innerHTML = neighborhood;
     option.value = neighborhood;
 
-    //Accessibility
+    // Accessibility
     option.setAttribute('role', 'option');
     select.append(option);
   });
-}
+};
 
 /**
  * Fetch all cuisines and set their HTML.
@@ -56,7 +56,7 @@ const fetchCuisines = () => {
       fillCuisinesHTML();
     }
   });
-}
+};
 
 /**
  * Set cuisines HTML.
@@ -64,30 +64,30 @@ const fetchCuisines = () => {
 const fillCuisinesHTML = (cuisines = self.cuisines) => {
   const select = document.getElementById('cuisines-select');
 
-  cuisines.forEach(cuisine => {
+  cuisines.forEach((cuisine) => {
     const option = document.createElement('option');
     option.innerHTML = cuisine;
     option.value = cuisine;
     select.append(option);
   });
-}
+};
 
 /**
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
-  let loc = {
+  const loc = {
     lat: 40.722216,
-    lng: -73.987501
+    lng: -73.987501,
   };
   self.map = new google.maps.Map(document.getElementById('map'), {
     zoom: 12,
     center: loc,
-    scrollwheel: false
+    scrollwheel: false,
   });
 
   updateRestaurants();
-}
+};
 
 /**
  * Update page and map for current restaurants.
@@ -102,7 +102,7 @@ const updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  //Accessibility
+  // Accessibility
   if (cIndex > 0) {
     cSelect.querySelectorAll('option').forEach((item, index) => {
       if (index === cIndex) {
@@ -121,7 +121,6 @@ const updateRestaurants = () => {
         item.removeAttribute('aria-selected');
       }
     });
-
   }
 
   DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
@@ -131,8 +130,8 @@ const updateRestaurants = () => {
       resetRestaurants(restaurants);
       fillRestaurantsHTML();
     }
-  })
-}
+  });
+};
 
 /**
  * Clear current restaurants, their HTML and remove their map markers.
@@ -147,7 +146,7 @@ const resetRestaurants = (restaurants) => {
   self.markers.forEach(m => m.setMap(null));
   self.markers = [];
   self.restaurants = restaurants;
-}
+};
 
 /**
  * Create all restaurants HTML and add them to the webpage.
@@ -160,7 +159,7 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
   if (window.google) {
     addMarkersToMap();
   }
-}
+};
 
 /**
  * Create restaurant HTML.
@@ -171,36 +170,34 @@ const createRestaurantHTML = (restaurant, index) => {
   const figure = document.createElement('figure');
   const picture = document.createElement('picture');
 
-  for (let breakPoint of responsiveBreakPoints) {
-
+  for (const breakPoint of responsiveBreakPoints) {
     const source = document.createElement('source');
     source.media = '';
-    if (breakPoint.media.maxwidth && breakPoint.media.minwidth)
-      source.media += `(min-width: ${breakPoint.media.minwidth}px) and (max-width: ${breakPoint.media.maxwidth}px)`;
-
-    else {
+    if (breakPoint.media.maxwidth && breakPoint.media.minwidth) { source.media += `(min-width: ${breakPoint.media.minwidth}px) and (max-width: ${breakPoint.media.maxwidth}px)`; } else {
       if (breakPoint.media.minwidth) source.media += `(min-width: ${breakPoint.media.minwidth}px)`;
       if (breakPoint.media.maxwidth) source.media += `(max-width: ${breakPoint.media.maxwidth}px)`;
     }
 
-    var srcsets = [];
+    const srcsets = [];
 
-    for (var srcset of breakPoint.srcset) {
-      if (srcset.imgSuffix === "small") continue;
+    for (const srcset of breakPoint.srcset) {
+      if (srcset.imgSuffix === 'small') continue;
       srcsets.push(`${DBHelper.imageUrlForRestaurant(restaurant, srcset.imgSuffix)}  ${srcset.imgCondition}`);
     }
 
     // if there is src set Add
     if (srcsets.length > 0) {
-      source.srcset = srcsets.join(srcsets, ',');
-      picture.append(source)
+      // source.srcset = srcsets.join(srcsets, ',');
+      source.dataset.srcset = srcsets.join(srcsets, ',');
+      picture.append(source);
     }
-
   }
 
   const image = document.createElement('img');
-  image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
+  image.className = 'restaurant-img lazy';
+  // image.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
+  image.dataset.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
+
   image.alt = `Image of the restaurant ${restaurant.name}`;
   picture.append(image);
 
@@ -209,7 +206,6 @@ const createRestaurantHTML = (restaurant, index) => {
   const figureCaption = document.createElement('figcaption');
   figureCaption.innerHTML = restaurant.name;
   figure.append(figureCaption);
-
 
 
   li.append(figure); // TODO : append figure
@@ -230,22 +226,22 @@ const createRestaurantHTML = (restaurant, index) => {
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
   more.setAttribute('tabindex', index + 3);
-  li.append(more)
+  li.append(more);
 
   // Set Tabindex
-  return li
-}
+  return li;
+};
 
 /**
  * Add markers for current restaurants to the map.
  */
 const addMarkersToMap = (restaurants = self.restaurants) => {
-  restaurants.forEach(restaurant => {
+  restaurants.forEach((restaurant) => {
     // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
     google.maps.event.addListener(marker, 'click', () => {
-      window.location.href = marker.url
+      window.location.href = marker.url;
     });
     self.markers.push(marker);
   });
-}
+};
