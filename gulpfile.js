@@ -73,12 +73,14 @@ gulp.task('styles', () => gulp.src(paths.styles.src)
   .pipe(cleanCSS({ compatibility: 'ie8' }))
   .pipe(gulp.dest(paths.styles.dest)));
 
-gulp.task('scripts', () => gulp.src(paths.scripts.src)
-  .pipe(sourcemaps.init())
-  .pipe(gulpBabel({ presets: ['es2015'] }))
-  .pipe(gulpUglify())
-  .pipe(sourcemaps.write('.'))
-  .pipe(gulp.dest(paths.scripts.dest)));
+gulp.task('scripts', () =>
+  gulp.src(['src/js/shared.js', 'src/js/dbhelper.js', 'src/js/main.js', 'src/js/swregister.js'])
+    .pipe(sourcemaps.init())
+    .pipe(gulpBabel({ presets: ['es2015'] }))
+    .pipe(gulpUglify())
+    .pipe(concat('all.min.js'))
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest(paths.scripts.dest)));
 
 
 gulp.task('default', ['html', 'images', 'styles', 'scripts'], () => {

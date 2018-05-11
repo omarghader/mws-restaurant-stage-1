@@ -78,6 +78,7 @@ class DBHelper {
   static fetchRestaurants(callback) {
     DBHelper.getDataFromDB(null, (data) => {
       if (data) {
+        console.log('[[DATAFROMDB]]', data);
         callback(null, data);
       }
 

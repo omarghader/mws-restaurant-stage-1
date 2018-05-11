@@ -16,7 +16,22 @@
 
   <title>Restaurant Review Application</title>
 
-  <link rel="stylesheet" href="css/style.min.css">
+  <!-- <noscript id="deferred-styles">
+    <link rel="stylesheet" type="text/css" href="css/style.min.css"/>
+  </noscript>
+  <script>
+    var loadDeferredStyles = function() {
+      var addStylesNode = document.getElementById("deferred-styles");
+      var replacement = document.createElement("div");
+      replacement.innerHTML = addStylesNode.textContent;
+      document.body.appendChild(replacement)
+      addStylesNode.parentElement.removeChild(addStylesNode);
+    };
+    var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+    if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
+    else window.addEventListener('load', loadDeferredStyles);
+  </script> -->
 
   <title>Restaurant Reviews</title>
 </head>
@@ -47,14 +62,13 @@
   </main>
 
 
-  <script type="text/javascript" src="js/shared.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/lazyload.js"></script>
-  <script type="application/javascript" charset="utf-8" src="/sw.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/swregister.js"></script>
+  <script type="text/javascript" src="js/all.min.js"></script>
+  <link rel="stylesheet" href="css/style.min.css">
+  <script async defer type="text/javascript" src="/sw.js"></script>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZGXODnOvH6vOy8rR8dl9LvRPcsdeJ7bc&libraries=places&callback=initMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?force=lite&key=AIzaSyAZGXODnOvH6vOy8rR8dl9LvRPcsdeJ7bc&libraries=places&callback=initMap"></script>
+
+
 
   <footer id="footer">
     Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.

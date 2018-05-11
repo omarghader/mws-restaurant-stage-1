@@ -8,9 +8,9 @@ const markers = [];
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  updateRestaurants();
   fetchNeighborhoods();
   fetchCuisines();
-  updateRestaurants();
 });
 
 
@@ -86,7 +86,7 @@ window.initMap = () => {
     scrollwheel: false,
   });
 
-  updateRestaurants();
+  // updateRestaurants();
 };
 
 /**
@@ -157,6 +157,7 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
     ul.append(createRestaurantHTML(restaurant, index));
   });
   if (window.google) {
+    console.log('filling markers');
     addMarkersToMap();
   }
 };
@@ -187,16 +188,19 @@ const createRestaurantHTML = (restaurant, index) => {
 
     // if there is src set Add
     if (srcsets.length > 0) {
-      // source.srcset = srcsets.join(srcsets, ',');
-      source.dataset.srcset = srcsets.join(srcsets, ',');
+      source.srcset = srcsets.join(srcsets, ',');
+      // source.dataset.srcset = srcsets.join(srcsets, ',');
+
       picture.append(source);
     }
   }
 
   const image = document.createElement('img');
+  // image.src = '/img/restaurant.png';
+
   image.className = 'restaurant-img lazy';
-  // image.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
-  image.dataset.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
+  image.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
+  // image.dataset.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
 
   image.alt = `Image of the restaurant ${restaurant.name}`;
   picture.append(image);

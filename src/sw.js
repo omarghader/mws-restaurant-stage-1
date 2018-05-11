@@ -11,12 +11,14 @@ self.addEventListener('install', (event) => {
       '/',
       '/index.html',
       '/restaurant.html',
-      '/js/dbhelper.js',
-      '/js/main.js',
-      '/js/restaurant_info.js',
-      '/js/shared.js',
-      '/js/swregister.js',
+      // '/js/restaurant_info.js',
+      '/js/all.min.js',
       '/css/style.min.css',
+      // '/css/styles.css',
+      // '/css/small.css',
+      // '/css/medium.css',
+      // '/css/large.css',
+      // '/css/xlarge.css',
     ]);
   }));
 });

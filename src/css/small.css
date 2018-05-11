@@ -1,0 +1,74 @@
+@charset "utf-8";
+
+/* CSS Document */
+
+
+/*
+ * 3 breakpoints were defined:
+ - 500px
+ - 750px
+ - 850px
+ - 1000px
+ */
+
+/* ====================== Navigation ====================== */
+
+
+/* ====================== Map ====================== */
+
+
+/* ====================== Restaurant Filtering ====================== */
+
+
+/* ====================== Restaurant Listing ====================== */
+
+
+@media screen and (max-width: 499px) {
+  nav:nth-child(1) {
+    height: 55px;
+  }
+  nav h1 a {
+    letter-spacing: 5px;
+    font-size: 1em;
+  }
+  #map {
+    height: 25vh;
+  }
+  .filter-options h2 {
+    width: 100%;
+  }
+  .filter-options select {
+    width: 100%;
+    max-width: 100%;
+  }
+  /* ====================== Restaurant Details ====================== */
+  #breadcrumb {
+    width: 100%;
+  }
+  .inside #maincontent {
+    top: 100px;
+    position: relative;
+  }
+  .inside #map-container {
+    order: -1;
+    max-height: 200px;
+    height: 200px;
+    width: 100%;
+    position: relative;
+    top: 0px;
+  }
+  .restaurant-wrapper{
+    width: 100%;
+  }
+  #restaurant-container, #reviews-container {
+    padding: 20px 10px 10px;
+  }
+  /* ====================== Footer ====================== */
+  .inside #footer {
+    position: relative;
+    top:50px;
+    width: calc(100% - 30px);
+    padding:15px;
+    font-size: 1em;
+  }
+}

@@ -1,59 +1,59 @@
-let lazy = [];
-
-
-function setLazy() {
-  // document.getElementById('listing').removeChild(document.getElementById('viewMore'));
-  // document.getElementById('nextPage').removeAttribute('class');
-
-  lazy = document.querySelectorAll('img[data-src]');
-  console.log(`Found ${lazy.length} lazy images`);
-}
-
-function lazyLoad() {
-  lazy = document.querySelectorAll('img[data-src]');
-
-  for (let i = 0; i < lazy.length; i++) {
-    if (isInViewport(lazy[i])) {
-      if (lazy[i].getAttribute('data-src')) {
-        lazy[i].src = lazy[i].getAttribute('data-src');
-        lazy[i].removeAttribute('data-src');
-      }
-    }
-  }
-
-  cleanLazy();
-}
-
-function cleanLazy() {
-  lazy = Array.prototype.filter.call(lazy, l => l.getAttribute('data-src'));
-}
-
-function isInViewport(el) {
-  const rect = el.getBoundingClientRect();
-
-  return (
-    rect.bottom >= 0 &&
-        rect.right >= 0 &&
-        rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.left <= (window.innerWidth || document.documentElement.clientWidth)
-  );
-}
-
-function registerListener(event, func) {
-  if (window.addEventListener) {
-    window.addEventListener(event, func);
-  } else {
-    window.attachEvent(`on${event}`, func);
-  }
-}
-
-
-registerListener('load', setLazy);
-registerListener('load', lazyLoad);
-registerListener('scroll', lazyLoad);
-registerListener('resize', lazyLoad);
-
+// let lazy = [];
 //
+//
+// function setLazy() {
+//   // document.getElementById('listing').removeChild(document.getElementById('viewMore'));
+//   // document.getElementById('nextPage').removeAttribute('class');
+//
+//   lazy = document.querySelectorAll('img[data-src]');
+//   console.log(`Found ${lazy.length} lazy images`);
+// }
+//
+// function lazyLoad() {
+//   lazy = document.querySelectorAll('img[data-src]');
+//
+//   for (let i = 0; i < lazy.length; i++) {
+//     if (isInViewport(lazy[i])) {
+//       if (lazy[i].getAttribute('data-src')) {
+//         lazy[i].src = lazy[i].getAttribute('data-src');
+//         lazy[i].removeAttribute('data-src');
+//       }
+//     }
+//   }
+//
+//   cleanLazy();
+// }
+//
+// function cleanLazy() {
+//   lazy = Array.prototype.filter.call(lazy, l => l.getAttribute('data-src'));
+// }
+//
+// function isInViewport(el) {
+//   const rect = el.getBoundingClientRect();
+//
+//   return (
+//     rect.bottom >= 0 &&
+//         rect.right >= 0 &&
+//         rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+//         rect.left <= (window.innerWidth || document.documentElement.clientWidth)
+//   );
+// }
+//
+// function registerListener(event, func) {
+//   if (window.addEventListener) {
+//     window.addEventListener(event, func);
+//   } else {
+//     window.attachEvent(`on${event}`, func);
+//   }
+// }
+//
+//
+// registerListener('load', setLazy);
+// registerListener('load', lazyLoad);
+// registerListener('scroll', lazyLoad);
+// registerListener('resize', lazyLoad);
+
+
 // document.addEventListener('DOMContentLoaded', () => {
 //   let lazyImages = [].slice.call(document.querySelectorAll('img.lazy'));
 //   let active = false;

@@ -65,25 +65,81 @@ const responsiveImage = (restaurant) => {
 
     // if there is src set Add
     if (srcsets.length > 0) {
-      // source.srcset = srcsets.join(srcsets, ',');
-      source.dataset.srcset = srcsets.join(srcsets, ',');
+      source.srcset = srcsets.join(srcsets, ',');
+      // source.dataset.srcset = srcsets.join(srcsets, ',');
 
       picture.append(source);
     }
   }
 
-  // const image = document.createElement('img');
-  // image.className = 'restaurant-img';
-  // // image.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
+  const image = document.createElement('img');
+  image.className = 'restaurant-img';
+  image.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
   // image.dataset.src = DBHelper.imageUrlForRestaurant(restaurant, 'small');
-  // image.alt = `Image of the restaurant ${restaurant.name}`;
-  // picture.append(image);
-  //
-  // figure.append(picture);
-  //
-  // const figureCaption = document.createElement('figcaption');
-  // figureCaption.innerHTML = restaurant.name;
-  // figure.append(figureCaption);
-  //
-  // return figure;
+  image.alt = `Image of the restaurant ${restaurant.name}`;
+  picture.append(image);
+
+  figure.append(picture);
+
+  const figureCaption = document.createElement('figcaption');
+  figureCaption.innerHTML = restaurant.name;
+  figure.append(figureCaption);
+
+  return figure;
 };
+
+//
+let lazy = [];
+
+
+function setLazy() {
+  // document.getElementById('listing').removeChild(document.getElementById('viewMore'));
+  // document.getElementById('nextPage').removeAttribute('class');
+
+  lazy = document.querySelectorAll('img[data-src]');
+  console.log(`Found ${lazy.length} lazy images`);
+}
+
+function lazyLoad() {
+  lazy = document.querySelectorAll('img[data-src]');
+
+  for (let i = 0; i < lazy.length; i++) {
+    if (isInViewport(lazy[i])) {
+      if (lazy[i].getAttribute('data-src')) {
+        lazy[i].src = lazy[i].getAttribute('data-src');
+        lazy[i].removeAttribute('data-src');
+      }
+    }
+  }
+
+  cleanLazy();
+}
+
+function cleanLazy() {
+  lazy = Array.prototype.filter.call(lazy, l => l.getAttribute('data-src'));
+}
+
+function isInViewport(el) {
+  const rect = el.getBoundingClientRect();
+
+  return (
+    rect.bottom >= 0 &&
+        rect.right >= 0 &&
+        rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.left <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+}
+
+function registerListener(event, func) {
+  if (window.addEventListener) {
+    window.addEventListener(event, func);
+  } else {
+    window.attachEvent(`on${event}`, func);
+  }
+}
+
+
+registerListener('load', setLazy);
+registerListener('load', lazyLoad);
+registerListener('scroll', lazyLoad);
+registerListener('resize', lazyLoad);
