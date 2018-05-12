@@ -157,7 +157,6 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
     ul.append(createRestaurantHTML(restaurant, index));
   });
   if (window.google) {
-    console.log('filling markers');
     addMarkersToMap();
   }
 };

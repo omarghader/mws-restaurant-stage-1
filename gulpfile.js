@@ -73,15 +73,26 @@ gulp.task('styles', () => gulp.src(paths.styles.src)
   .pipe(cleanCSS({ compatibility: 'ie8' }))
   .pipe(gulp.dest(paths.styles.dest)));
 
-gulp.task('scripts', () =>
+
+gulp.task('scripts-home', () =>
   gulp.src(['src/js/shared.js', 'src/js/dbhelper.js', 'src/js/main.js', 'src/js/swregister.js'])
     .pipe(sourcemaps.init())
     .pipe(gulpBabel({ presets: ['es2015'] }))
     .pipe(gulpUglify())
-    .pipe(concat('all.min.js'))
+    .pipe(concat('home.min.js'))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(paths.scripts.dest)));
 
+gulp.task('scripts-info', () =>
+  gulp.src(['src/js/shared.js', 'src/js/dbhelper.js', 'src/js/restaurant_info.js', 'src/js/swregister.js'])
+    .pipe(sourcemaps.init())
+    .pipe(gulpBabel({ presets: ['es2015'] }))
+    .pipe(gulpUglify())
+    .pipe(concat('info.min.js'))
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest(paths.scripts.dest)));
+
+gulp.task('scripts', ['scripts-home', 'scripts-info']);
 
 gulp.task('default', ['html', 'images', 'styles', 'scripts'], () => {
   gulp.watch(paths.scripts.src, ['scripts']);
