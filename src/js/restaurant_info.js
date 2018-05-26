@@ -33,6 +33,35 @@ window.onload = () => {
   }
 };
 
+function handleModalReviews() {
+  // Get the modal
+  const modal = document.getElementById('review-modal');
+
+  // Get the button that opens the modal
+  const btn = document.getElementById('open-review');
+
+  // Get the <span> element that closes the modal
+  const span = document.getElementsByClassName('close')[0];
+
+  // When the user clicks the button, open the modal
+  btn.onclick = function () {
+    modal.style.display = 'block';
+  };
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function () {
+    modal.style.display = 'none';
+  };
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  };
+}
+
+handleModalReviews();
 
 /**
  * Get current restaurant from page URL.
@@ -81,7 +110,6 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   figure.innerHTML = image.innerHTML;
   // container.insertBefore(image, container.children[1])
 
-
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
 
@@ -117,6 +145,7 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
  * Create all reviews HTML and add them to the webpage.
  */
 const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+  console.log(self.restaurant);
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
@@ -177,11 +206,55 @@ const fillBreadcrumb = (restaurant = self.restaurant) => {
  * Get a parameter by name from page URL.
  */
 const getParameterByName = (name, url) => {
-  if (!url) { url = window.location.href; }
+  if (!url) {
+    url = window.location.href;
+  }
   name = name.replace(/[\[\]]/g, '\\$&');
   const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`),
     results = regex.exec(url);
-  if (!results) { return null; }
-  if (!results[2]) { return ''; }
+  if (!results) {
+    return null;
+  }
+  if (!results[2]) {
+    return '';
+  }
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+};
+
+/**
+ * Send Review
+ */
+
+const sendReview = () => {
+  const form = document.querySelector('#review-form');
+  const id = parseInt(getParameterByName('id'), 10);
+  const name = form.elements[0].value;
+  const rating = form.elements[1].value;
+  const comments = form.elements[2].value;
+  if (!id || !name || !rating || !comments) {
+    console.log('one value is missing');
+    return;
+  }
+  fetch('http://localhost:1337/reviews/', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      restaurant_id: id,
+      name,
+      rating,
+      comments,
+    }),
+  }).then(res => res.json())
+    .then((data) => {
+      console.log(data);
+      // Get the modal
+      const modal = document.getElementById('review-modal');
+      modal.style.display = 'none';
+      form.reset();
+    }).catch((err) => {
+      console.log('[error]', err);
+    });
 };

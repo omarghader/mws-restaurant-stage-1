@@ -27,7 +27,7 @@
       <h1><a href="/">Restaurant Reviews</a></h1>
     </nav>
     <!-- Beginning breadcrumb -->
-    <nav  id="navBreadcrumb" aria-label="Breadcrumb">
+    <nav id="navBreadcrumb" aria-label="Breadcrumb">
       <ul id="breadcrumb" class="breadcrumb">
         <li><a href="/">Home</a></li>
       </ul>
@@ -60,7 +60,35 @@
       </section>
     </section>
     <!-- End reviews -->
+    <a role="button" href="#" id="open-review" class="float">
+        <span class="my-float">✎<span>
+    </a>
+
+    <!-- The Modal -->
+    <div id="review-modal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <h3> Write a review</h3>
+
+        <div style="width:100%">
+          <span class="close">&times;</span>
+        </div>
+        <form id="review-form">
+          <label for="name">Name </label>
+          <input id="name" name="name" type="text" placeholder="Your name">
+          <label for="name">Rating </label>
+          <input name="ratng" type="number" placeholder="1 to 5">
+          <label for="name">Comments </label>
+          <input name="comment" type="text" placeholder="Did you like the restaurant?">
+        </form>
+        <button onclick="sendReview()"> Submit</button>
+      </div>
+
+    </div>
   </main>
+
+
+
   <!-- End main -->
 
   <!-- Beginning footer -->
@@ -70,14 +98,7 @@
   <!-- End footer -->
 
   <!-- Beginning scripts -->
-  <!-- <script type="text/javascript" src="js/shared.js"></script> -->
 
-  <!-- Database helpers -->
-  <!-- <script type="text/javascript" src="js/dbhelper.js"></script> -->
-  <!-- Main javascript file -->
-  <!-- <link rel="stylesheet" href="css/style.min.css"> -->
-
-  <!-- <script type="text/javascript" src="js/restaurant_info.js"></script> -->
   <!-- Google Maps -->
   <script type="text/javascript" src="js/info.min.js"></script>
   <link rel="stylesheet" href="css/style.min.css">

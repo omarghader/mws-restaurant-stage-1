@@ -2,7 +2,8 @@
  * Common database helper functions.
  */
 
-const dbname = 'mws';
+const restoDbname = 'restomws';
+const reviewsDbname = 'reviewsmws';
 const objectStore = 'mwsObjectStore';
 
 // eslint-disable-next-line
@@ -16,12 +17,16 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
+  // ===========================================
+  // Restaurants
+  // ===========================================
+
   static initDB() {
     // This works on all devices/browsers, and uses IndexedDBShim as a final fallback
     const indexedDB = window.indexedDB; // eslint-disable-line
 
     // Open (or create) the database
-    const open = indexedDB.open(dbname, 1);
+    const open = indexedDB.open(restoDbname, 1);
 
     // Create the schema
     open.onupgradeneeded = function onupgradeneeded() {
@@ -33,7 +38,8 @@ class DBHelper {
     return open;
   }
 
-  static storeDataToDB(data) {
+
+  static storeRestoToDB(data) {
     const open = DBHelper.initDB();
 
     open.onsuccess = function onsuccess() {
@@ -48,7 +54,7 @@ class DBHelper {
     };
   }
 
-  static getDataFromDB(query, callback) {
+  static getRestoFromDB(query, callback) {
     const open = DBHelper.initDB();
 
     open.onsuccess = function onsuccess() {
@@ -72,11 +78,78 @@ class DBHelper {
       };
     };
   }
+
+  // ===========================================
+  // Reviews
+  // ===========================================
+
+  static initReviewsDB() {
+    // This works on all devices/browsers, and uses IndexedDBShim as a final fallback
+      const indexedDB = window.indexedDB; // eslint-disable-line
+
+    // Open (or create) the database
+    const open = indexedDB.open(reviewsDbname, 1);
+
+    // Create the schema
+    open.onupgradeneeded = function onupgradeneeded() {
+      const db = open.result;
+      db.createObjectStore(objectStore, { keyPath: 'id' });
+      // var index = store.createIndex("NameIndex", ["name.last", "name.first"]);
+    };
+
+    return open;
+  }
+
+
+  static storeReviewsToDB(data) {
+    const open = DBHelper.initReviewsDB();
+
+    open.onsuccess = function onsuccess() {
+      // Start a new transaction
+      const db = open.result;
+      const tx = db.transaction(objectStore, 'readwrite');
+      const store = tx.objectStore(objectStore);
+
+      data.forEach((resto) => {
+        store.put(resto);
+      });
+    };
+  }
+
+  static getReviewsFromDB(query, callback) {
+    const open = DBHelper.initReviewsDB();
+
+    open.onsuccess = function onsuccess() {
+      // Start a new transaction
+      const db = open.result;
+      const tx = db.transaction(objectStore, 'readwrite');
+      const store = tx.objectStore(objectStore);
+
+      let res = store.getAll();
+      if (query) {
+        res = store.get(parseInt(query, 10));
+      }
+
+      res.onsuccess = function resonsuccess() {
+        callback(res.result);
+      };
+
+      // Close the db when the transaction is done
+      tx.oncomplete = function oncomplete() {
+        db.close();
+      };
+    };
+  }
+
+
+  // ===========================================
+  // ===========================================
+
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    DBHelper.getDataFromDB(null, (data) => {
+    DBHelper.getRestoFromDB(null, (data) => {
       if (data) {
         console.log('[[DATAFROMDB]]', data);
         callback(null, data);
@@ -85,7 +158,7 @@ class DBHelper {
       // eslint-disable-next-line
       fetch(DBHelper.DATABASE_URL).then(res => res.json()).then((restaurants) => {
         callback(null, restaurants);
-        DBHelper.storeDataToDB(restaurants);
+        DBHelper.storeRestoToDB(restaurants);
       }).catch((err) => {
         const error = ('Request failed', err);
         callback(error, null);
@@ -93,12 +166,13 @@ class DBHelper {
     });
   }
 
+
   /**
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
-    DBHelper.getDataFromDB(id, (data) => {
+    DBHelper.getRestoFromDB(id, (data) => {
       console.log('data', id, data);
       if (data) {
         console.log('[[DATAFROMDB]]', data);
@@ -120,22 +194,6 @@ class DBHelper {
         }
       });
     });
-
-    // fetch all restaurants with proper error handling.
-    // DBHelper.fetchRestaurants((error, restaurants) => {
-    //   if (error) {
-    //     callback(error, null);
-    //   } else {
-    //     console.log(id, restaurants);
-    //     window.restaurants = restaurants;
-    //     const restaurant = restaurants.find(r => r.id === id);
-    //     if (restaurant) { // Got the restaurant
-    //       callback(null, restaurant);
-    //     } else { // Restaurant does not exist in the database
-    //       callback('Restaurant does not exist', null);
-    //     }
-    //   }
-    // });
   }
 
   /**

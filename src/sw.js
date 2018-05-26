@@ -11,14 +11,9 @@ self.addEventListener('install', (event) => {
       '/',
       '/index.html',
       '/restaurant.html',
-      // '/js/restaurant_info.js',
-      '/js/all.min.js',
+      '/js/home.min.js',
+      '/js/info.min.js',
       '/css/style.min.css',
-      // '/css/styles.css',
-      // '/css/small.css',
-      // '/css/medium.css',
-      // '/css/large.css',
-      // '/css/xlarge.css',
     ]);
   }));
 });
