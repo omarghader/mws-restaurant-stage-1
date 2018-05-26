@@ -59,7 +59,7 @@ class DBHelper {
 
       let res = store.getAll();
       if (query) {
-        res = store.get(query);
+        res = store.get(parseInt(query, 10));
       }
 
       res.onsuccess = function resonsuccess() {
@@ -98,18 +98,44 @@ class DBHelper {
    */
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        const restaurant = restaurants.find(r => r.id === id);
-        if (restaurant) { // Got the restaurant
-          callback(null, restaurant);
-        } else { // Restaurant does not exist in the database
-          callback('Restaurant does not exist', null);
-        }
+    DBHelper.getDataFromDB(id, (data) => {
+      console.log('data', id, data);
+      if (data) {
+        console.log('[[DATAFROMDB]]', data);
+        callback(null, data);
+        return;
       }
+
+      DBHelper.fetchRestaurants((error, restaurants) => {
+        if (error) {
+          callback(error, null);
+        } else {
+          console.log(id, restaurants);
+          const restaurant = restaurants.find(r => r.id === id);
+          if (restaurant) { // Got the restaurant
+            callback(null, restaurant);
+          } else { // Restaurant does not exist in the database
+            callback('Restaurant does not exist', null);
+          }
+        }
+      });
     });
+
+    // fetch all restaurants with proper error handling.
+    // DBHelper.fetchRestaurants((error, restaurants) => {
+    //   if (error) {
+    //     callback(error, null);
+    //   } else {
+    //     console.log(id, restaurants);
+    //     window.restaurants = restaurants;
+    //     const restaurant = restaurants.find(r => r.id === id);
+    //     if (restaurant) { // Got the restaurant
+    //       callback(null, restaurant);
+    //     } else { // Restaurant does not exist in the database
+    //       callback('Restaurant does not exist', null);
+    //     }
+    //   }
+    // });
   }
 
   /**
