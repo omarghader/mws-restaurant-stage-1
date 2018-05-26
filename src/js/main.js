@@ -75,6 +75,18 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
 /**
  * Initialize Google map, called from HTML.
  */
+
+document.querySelector('.show-map').addEventListener('click', () => {
+  const s = document.createElement('script');
+  s.setAttribute('src', 'https://maps.googleapis.com/maps/api/js?force=lite&key=AIzaSyAZGXODnOvH6vOy8rR8dl9LvRPcsdeJ7bc&libraries=places&callback=initMap');
+  s.setAttribute('defer', 'true');
+  s.setAttribute('async', 'true');
+  document.body.appendChild(s);
+  const showMap = document.querySelector('.show-map');
+  showMap.parentNode.removeChild(showMap);
+});
+
+
 window.initMap = () => {
   const loc = {
     lat: 40.722216,
@@ -86,7 +98,7 @@ window.initMap = () => {
     scrollwheel: false,
   });
 
-  // updateRestaurants();
+  updateRestaurants();
 };
 
 /**
