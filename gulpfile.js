@@ -12,6 +12,11 @@ const compress = require('compression');
 
 const concat = require('gulp-concat');
 
+function swallowError(error) {
+  // If you want details of the error in the console
+  console.log(error.toString());
+  this.emit('end');
+}
 
 const paths = {
   project: {
@@ -37,9 +42,11 @@ gulp.task('clean', () => gulp.src('dist/**/*', { read: false })
 gulp.task('html', () => {
   gulp.src(['src/*.html'])
     .pipe(htmlmin({ collapseWhitespace: true }))
+    .on('error', swallowError)
     .pipe(gulp.dest('dist'));
 
   gulp.src(['src/sw.js', 'src/manifest.json'])
+    .on('error', swallowError)
     .pipe(gulp.dest('dist'));
 });
 
@@ -64,6 +71,7 @@ gulp.task('images', () => {
       }],
       '*.png': [{ quality: 100 }],
     }))
+    .on('error', swallowError)
     .pipe(gulp.dest('dist/img'));
 });
 
@@ -71,6 +79,7 @@ gulp.task('styles', () => gulp.src(paths.styles.src)
   .pipe(concat('style.min.css'))
   .pipe(gcmq())
   .pipe(cleanCSS({ compatibility: 'ie8' }))
+  .on('error', swallowError)
   .pipe(gulp.dest(paths.styles.dest)));
 
 
@@ -81,15 +90,17 @@ gulp.task('scripts-home', () =>
     .pipe(gulpUglify())
     .pipe(concat('home.min.js'))
     .pipe(sourcemaps.write('.'))
+    .on('error', swallowError)
     .pipe(gulp.dest(paths.scripts.dest)));
 
 gulp.task('scripts-info', () =>
-  gulp.src(['src/js/shared.js', 'src/js/dbhelper.js', 'src/js/restaurant_info.js', 'src/js/swregister.js'])
+  gulp.src(['src/js/shared.js', 'src/js/dbhelper.js', 'src/js/connectivity.js', 'src/js/restaurant_info.js', 'src/js/swregister.js'])
     .pipe(sourcemaps.init())
     .pipe(gulpBabel({ presets: ['es2015'] }))
     .pipe(gulpUglify())
     .pipe(concat('info.min.js'))
     .pipe(sourcemaps.write('.'))
+    .on('error', swallowError)
     .pipe(gulp.dest(paths.scripts.dest)));
 
 gulp.task('scripts', ['scripts-home', 'scripts-info']);

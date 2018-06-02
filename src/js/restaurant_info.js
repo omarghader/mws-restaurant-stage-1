@@ -72,7 +72,6 @@ const fetchRestaurantFromURL = (callback) => {
     return;
   }
   const id = getParameterByName('id');
-  console.log('[[id]]', id);
   if (!id) { // no id found in URL
     console.log('[[IDNOTFOUND]]', id);
     const error = 'No restaurant id in URL';
@@ -86,6 +85,17 @@ const fetchRestaurantFromURL = (callback) => {
       }
       fillRestaurantHTML();
       callback(null, restaurant);
+    });
+
+    DBHelper.fetchReviewsByRestaurantID(id, (error, reviews) => {
+      console.log('reviews', id, reviews, error);
+      if (!reviews) {
+        console.error(error);
+        return;
+      }
+      restaurant.reviews = reviews;
+      // fill reviews
+      fillReviewsHTML(restaurant.reviews);
     });
   }
 };
@@ -117,8 +127,6 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-  // fill reviews
-  fillReviewsHTML();
 };
 
 /**
@@ -145,8 +153,8 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
  * Create all reviews HTML and add them to the webpage.
  */
 const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
-  console.log(self.restaurant);
   const container = document.getElementById('reviews-container');
+
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
@@ -155,15 +163,25 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
     container.appendChild(noReviews);
-    return;
   }
+
+  fillReviewsList(reviews);
+};
+
+function fillReviewsList(reviews) {
+  const container = document.getElementById('reviews-container');
   const ul = document.getElementById('reviews-list');
+
+  // reset REVIEWS
+  while (ul.firstChild) {
+    ul.removeChild(ul.firstChild);
+  }
+
   reviews.forEach((review) => {
     ul.appendChild(createReviewHTML(review));
   });
   container.appendChild(ul);
-};
-
+}
 /**
  * Create review HTML and add it to the webpage.
  */
@@ -174,7 +192,7 @@ const createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.createdAt).toDateString();
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -226,35 +244,52 @@ const getParameterByName = (name, url) => {
  */
 
 const sendReview = () => {
+  const modal = document.getElementById('review-modal');
   const form = document.querySelector('#review-form');
   const id = parseInt(getParameterByName('id'), 10);
   const name = form.elements[0].value;
   const rating = form.elements[1].value;
   const comments = form.elements[2].value;
+
   if (!id || !name || !rating || !comments) {
     console.log('one value is missing');
     return;
   }
+
+  const body = {
+    createdAt: new Date().getTime(),
+    restaurant_id: id,
+    name,
+    rating,
+    comments,
+  };
   fetch('http://localhost:1337/reviews/', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      restaurant_id: id,
-      name,
-      rating,
-      comments,
-    }),
+    body: JSON.stringify(body),
   }).then(res => res.json())
-    .then((data) => {
-      console.log(data);
+    .catch((err) => {
+      console.log('[errorBeforeJSON]', err);
+      DBHelper.addPendingReview(body);
+    })
+    .finally(() => {
       // Get the modal
-      const modal = document.getElementById('review-modal');
-      modal.style.display = 'none';
       form.reset();
-    }).catch((err) => {
-      console.log('[error]', err);
+      modal.style.display = 'none';
+      console.log(id);
+      DBHelper.fetchReviewsByRestaurantID(id, (error, reviews) => {
+        console.log('reviews', reviews);
+        if (!reviews) {
+          console.error(error);
+          return;
+        }
+        restaurant.reviews = reviews;
+
+        // fill reviews
+        fillReviewsList(restaurant.reviews);
+      });
     });
 };

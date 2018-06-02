@@ -5,6 +5,7 @@
 const restoDbname = 'restomws';
 const reviewsDbname = 'reviewsmws';
 const objectStore = 'mwsObjectStore';
+const pendingReviewsID = 'pendingReviews';
 
 // eslint-disable-next-line
 class DBHelper {
@@ -14,7 +15,7 @@ class DBHelper {
    */
   static get DATABASE_URL() {
     const port = 1337; // Change this to your server port
-    return `http://localhost:${port}/restaurants`;
+    return `http://localhost:${port}`;
   }
 
   // ===========================================
@@ -79,68 +80,6 @@ class DBHelper {
     };
   }
 
-  // ===========================================
-  // Reviews
-  // ===========================================
-
-  static initReviewsDB() {
-    // This works on all devices/browsers, and uses IndexedDBShim as a final fallback
-      const indexedDB = window.indexedDB; // eslint-disable-line
-
-    // Open (or create) the database
-    const open = indexedDB.open(reviewsDbname, 1);
-
-    // Create the schema
-    open.onupgradeneeded = function onupgradeneeded() {
-      const db = open.result;
-      db.createObjectStore(objectStore, { keyPath: 'id' });
-      // var index = store.createIndex("NameIndex", ["name.last", "name.first"]);
-    };
-
-    return open;
-  }
-
-
-  static storeReviewsToDB(data) {
-    const open = DBHelper.initReviewsDB();
-
-    open.onsuccess = function onsuccess() {
-      // Start a new transaction
-      const db = open.result;
-      const tx = db.transaction(objectStore, 'readwrite');
-      const store = tx.objectStore(objectStore);
-
-      data.forEach((resto) => {
-        store.put(resto);
-      });
-    };
-  }
-
-  static getReviewsFromDB(query, callback) {
-    const open = DBHelper.initReviewsDB();
-
-    open.onsuccess = function onsuccess() {
-      // Start a new transaction
-      const db = open.result;
-      const tx = db.transaction(objectStore, 'readwrite');
-      const store = tx.objectStore(objectStore);
-
-      let res = store.getAll();
-      if (query) {
-        res = store.get(parseInt(query, 10));
-      }
-
-      res.onsuccess = function resonsuccess() {
-        callback(res.result);
-      };
-
-      // Close the db when the transaction is done
-      tx.oncomplete = function oncomplete() {
-        db.close();
-      };
-    };
-  }
-
 
   // ===========================================
   // ===========================================
@@ -151,12 +90,11 @@ class DBHelper {
   static fetchRestaurants(callback) {
     DBHelper.getRestoFromDB(null, (data) => {
       if (data) {
-        console.log('[[DATAFROMDB]]', data);
         callback(null, data);
       }
 
       // eslint-disable-next-line
-      fetch(DBHelper.DATABASE_URL).then(res => res.json()).then((restaurants) => {
+      fetch(`${DBHelper.DATABASE_URL}/restaurants`).then(res => res.json()).then((restaurants) => {
         callback(null, restaurants);
         DBHelper.storeRestoToDB(restaurants);
       }).catch((err) => {
@@ -173,9 +111,7 @@ class DBHelper {
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
     DBHelper.getRestoFromDB(id, (data) => {
-      console.log('data', id, data);
       if (data) {
-        console.log('[[DATAFROMDB]]', data);
         callback(null, data);
         return;
       }
@@ -184,7 +120,6 @@ class DBHelper {
         if (error) {
           callback(error, null);
         } else {
-          console.log(id, restaurants);
           const restaurant = restaurants.find(r => r.id === id);
           if (restaurant) { // Got the restaurant
             callback(null, restaurant);
@@ -323,5 +258,134 @@ class DBHelper {
     });
     // eslint-disable-next-line
     return marker;
+  }
+
+
+  // ===========================================
+  // Reviews
+  // ===========================================
+
+  static initReviewsDB() {
+  // This works on all devices/browsers, and uses IndexedDBShim as a final fallback
+    const indexedDB = window.indexedDB; // eslint-disable-line
+
+    // Open (or create) the database
+    const open = indexedDB.open(reviewsDbname, 1);
+
+    // Create the schema
+    open.onupgradeneeded = function onupgradeneeded() {
+      const db = open.result;
+      const store = db.createObjectStore(objectStore, { keyPath: 'id' });
+      store.createIndex('RestaurantIDIndex', ['restaurant_id']);
+    };
+
+    return open;
+  }
+
+
+  static storeReviewsToDB(data) {
+    const open = DBHelper.initReviewsDB();
+
+    open.onsuccess = function onsuccess() {
+    // Start a new transaction
+      const db = open.result;
+      const tx = db.transaction(objectStore, 'readwrite');
+      const store = tx.objectStore(objectStore);
+
+      data.forEach((resto) => {
+        store.put(resto);
+      });
+    };
+  }
+
+  static getReviewsFromDB(query, callback) {
+    const open = DBHelper.initReviewsDB();
+
+    open.onsuccess = function onsuccess() {
+    // Start a new transaction
+      const db = open.result;
+      const tx = db.transaction(objectStore, 'readwrite');
+      const store = tx.objectStore(objectStore);
+      const index = store.index('RestaurantIDIndex');
+
+      let res;
+      if (query) {
+        res = index.getAll([parseInt(query, 10)]);
+      } else {
+        res = index.getAll();
+      }
+
+      res.onsuccess = function resonsuccess() {
+        callback(res.result);
+      };
+
+      // Close the db when the transaction is done
+      tx.oncomplete = function oncomplete() {
+        db.close();
+      };
+    };
+  }
+
+  /**
+   * Fetch all restaurants.
+   */
+  static fetchReviewsByRestaurantID(id, callback) {
+    DBHelper.getReviewsFromDB(id, (data) => {
+      if (data) {
+        let restoReviews = data.slice(0);
+        const pendingReviews = DBHelper.getPendingReviewsByID(id);
+        restoReviews = restoReviews.concat(pendingReviews);
+        callback(null, restoReviews);
+      }
+
+      // eslint-disable-next-line
+      fetch(`${DBHelper.DATABASE_URL}/reviews?restaurant_id=${id}`).then(res => res.json()).then((reviews) => {
+        let restoReviews = reviews.slice(0);
+        const pendingReviews = DBHelper.getPendingReviewsByID(id);
+        restoReviews = restoReviews.concat(pendingReviews);
+
+        callback(null, restoReviews);
+        DBHelper.storeReviewsToDB(reviews);
+      }).catch((err) => {
+        const error = ('Request failed', err);
+        callback(error, null);
+      });
+    });
+  }
+
+  static addPendingReview(review) {
+    // Parse any JSON previously stored in allEntries
+    let existingEntries = JSON.parse(localStorage.getItem(pendingReviewsID));
+    if (existingEntries == null) existingEntries = [];
+    existingEntries.push(review);
+    localStorage.setItem(pendingReviewsID, JSON.stringify(existingEntries));
+  }
+
+  static getPendingReviews(review) {
+    // Parse any JSON previously stored in allEntries
+    let existingEntries = JSON.parse(localStorage.getItem(pendingReviewsID));
+    if (existingEntries == null) {
+      existingEntries = [];
+    }
+    return existingEntries;
+  }
+
+  static getPendingReviewsByID(id) {
+    const pendingReviews = DBHelper.getPendingReviews();
+    const numericID = parseInt(id, 10);
+
+    const restoReviews = [];
+
+    pendingReviews.forEach((pendingReview) => {
+      if (pendingReview.restaurant_id === numericID) {
+        restoReviews.push(pendingReview);
+      }
+    });
+    return restoReviews;
+  }
+
+  static ClearPendingReview() {
+    // Parse any JSON previously stored in allEntries
+    localStorage.removeItem(pendingReviewsID);
   }
 }
