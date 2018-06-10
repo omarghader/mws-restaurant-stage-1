@@ -1,6 +1,18 @@
 let restaurant;
 let map;
 
+
+document.addEventListener('DOMContentLoaded', (event) => {
+  fetchRestaurantFromURL((error, restaurant) => {
+    if (error) { // Got an error!
+      console.error(error);
+    } else {
+      console.log('[DOMContentLoaded]', self.restaurant);
+      fillBreadcrumb();
+    }
+  });
+});
+
 /**
  * Initialize Google map, called from HTML.
  */
@@ -14,24 +26,11 @@ window.initMap = () => {
         center: restaurant.latlng,
         scrollwheel: false,
       });
-      fillBreadcrumb();
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
     }
   });
 };
 
-window.onload = () => {
-  if (!window.google) {
-    fetchRestaurantFromURL((error, restaurant) => {
-      if (error) { // Got an error!
-        console.error(error);
-      } else {
-        fillBreadcrumb();
-        DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-      }
-    });
-  }
-};
 
 function handleModalReviews() {
   // Get the modal
@@ -134,6 +133,12 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
  */
 const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   const hours = document.getElementById('restaurant-hours');
+
+  // reset REVIEWS
+  while (hours.firstChild) {
+    hours.removeChild(hours.firstChild);
+  }
+
   for (const key in operatingHours) {
     const row = document.createElement('tr');
 
@@ -155,9 +160,12 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
 const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
 
-  const title = document.createElement('h3');
-  title.innerHTML = 'Reviews';
-  container.appendChild(title);
+  if (!container.querySelector('h3')) {
+    const title = document.createElement('h3');
+    title.innerHTML = 'Reviews';
+    container.appendChild(title);
+  }
+
 
   if (!reviews) {
     const noReviews = document.createElement('p');

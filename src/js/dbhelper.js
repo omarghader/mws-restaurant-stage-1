@@ -361,7 +361,7 @@ class DBHelper {
     localStorage.setItem(pendingReviewsID, JSON.stringify(existingEntries));
   }
 
-  static getPendingReviews(review) {
+  static getPendingReviews() {
     // Parse any JSON previously stored in allEntries
     let existingEntries = JSON.parse(localStorage.getItem(pendingReviewsID));
     if (existingEntries == null) {

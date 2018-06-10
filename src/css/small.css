@@ -11,6 +11,7 @@
  - 1000px
  */
 
+
 /* ====================== Navigation ====================== */
 
 
@@ -21,6 +22,22 @@
 
 
 /* ====================== Restaurant Listing ====================== */
+
+.restaurant-favorite {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.restaurant-favorite .star polygon {
+  fill: #d8d8d8;
+}
+
+.restaurant-favorite:hover .star polygon {
+  fill: #ffd055 !important;
+}
 
 
 @media screen and (max-width: 499px) {
@@ -46,7 +63,7 @@
     width: 100%;
   }
   .inside #maincontent {
-    top: 100px;
+    top: 120px;
     position: relative;
   }
   .inside #map-container {
@@ -57,7 +74,7 @@
     position: relative;
     top: 0px;
   }
-  .restaurant-wrapper{
+  .restaurant-wrapper {
     width: 100%;
   }
   #restaurant-container, #reviews-container {
@@ -66,9 +83,10 @@
   /* ====================== Footer ====================== */
   .inside #footer {
     position: relative;
-    top:50px;
+    top: 50px;
     width: calc(100% - 30px);
-    padding:15px;
+    padding: 15px;
     font-size: 1em;
+    margin-top: 50px;
   }
 }

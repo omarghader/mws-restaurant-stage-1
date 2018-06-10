@@ -1,6 +1,5 @@
 
 /* ====================== Restaurant Details ====================== */
-
 .inside header {
   position: fixed;
   top: 0;
@@ -176,6 +175,7 @@
 	border-radius:50px;
 	text-align:center;
 	box-shadow: 2px 2px 3px #999;
+  z-index: 1;
 }
 
 .my-float{

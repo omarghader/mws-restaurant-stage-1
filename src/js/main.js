@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchCuisines();
 });
 
-
 /**
  * Fetch all neighborhoods and set their HTML.
  */
@@ -85,7 +84,6 @@ document.querySelector('.show-map').addEventListener('click', () => {
   const showMap = document.querySelector('.show-map');
   showMap.parentNode.removeChild(showMap);
 });
-
 
 window.initMap = () => {
   const loc = {
@@ -185,15 +183,17 @@ const createRestaurantHTML = (restaurant, index) => {
   for (const breakPoint of responsiveBreakPoints) {
     const source = document.createElement('source');
     source.media = '';
-    if (breakPoint.media.maxwidth && breakPoint.media.minwidth) { source.media += `(min-width: ${breakPoint.media.minwidth}px) and (max-width: ${breakPoint.media.maxwidth}px)`; } else {
-      if (breakPoint.media.minwidth) source.media += `(min-width: ${breakPoint.media.minwidth}px)`;
-      if (breakPoint.media.maxwidth) source.media += `(max-width: ${breakPoint.media.maxwidth}px)`;
+    if (breakPoint.media.maxwidth && breakPoint.media.minwidth) {
+      source.media += `(min-width: ${breakPoint.media.minwidth}px) and (max-width: ${breakPoint.media.maxwidth}px)`;
+    } else {
+      if (breakPoint.media.minwidth) { source.media += `(min-width: ${breakPoint.media.minwidth}px)`; }
+      if (breakPoint.media.maxwidth) { source.media += `(max-width: ${breakPoint.media.maxwidth}px)`; }
     }
 
     const srcsets = [];
 
     for (const srcset of breakPoint.srcset) {
-      if (srcset.imgSuffix === 'small') continue;
+      if (srcset.imgSuffix === 'small') { continue; }
       srcsets.push(`${DBHelper.imageUrlForRestaurant(restaurant, srcset.imgSuffix)}  ${srcset.imgCondition}`);
     }
 
@@ -222,7 +222,6 @@ const createRestaurantHTML = (restaurant, index) => {
   figureCaption.innerHTML = restaurant.name;
   figure.append(figureCaption);
 
-
   li.append(figure); // TODO : append figure
 
   const name = document.createElement('h2');
@@ -243,6 +242,28 @@ const createRestaurantHTML = (restaurant, index) => {
   more.setAttribute('tabindex', index + 3);
   li.append(more);
 
+  const favorite = document.createElement('div');
+  favorite.innerHTML = `<svg height="25" width="23" class="star" data-rating="1">
+    <polygon points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78" style="fill-rule:nonzero;"/>
+  </svg>`;
+  favorite.className = 'restaurant-favorite';
+  favorite.dataset.id = restaurant.id;
+  favorite.addEventListener('click', () => {
+    toggleFavorite(restaurant.id);
+  });
+
+  // change color of favorite
+  const star = favorite.querySelector(`div[data-id="${restaurant.id}"] polygon`);
+
+  if (localStorage.getItem(`restaurant-favorite-${restaurant.id}`)) {
+    star.style.fill = '#ffd055';// yellow
+  } else {
+    localStorage.removeItem(`restaurant-favorite-${restaurant.id}`);
+    star.style.fill = '#d8d8d8'; // grey
+  }
+
+  li.append(favorite);
+
   // Set Tabindex
   return li;
 };
@@ -259,4 +280,19 @@ const addMarkersToMap = (restaurants = self.restaurants) => {
     });
     self.markers.push(marker);
   });
+};
+
+const toggleFavorite = (id) => {
+  console.log('id', 1);
+  const star = document.querySelector(`div[data-id="${id}"] polygon`);
+  if (!localStorage.getItem(`restaurant-favorite-${id}`)) {
+    console.log('add Favorite');
+    localStorage.setItem(`restaurant-favorite-${id}`, true);
+    // star.className = 'star is-restaurant-favorite';
+    star.style.fill = '#ffd055';
+  } else {
+    console.log('remove Favorite');
+    localStorage.removeItem(`restaurant-favorite-${id}`);
+    star.style.fill = '#d8d8d8';
+  }
 };
